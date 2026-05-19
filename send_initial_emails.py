@@ -19,7 +19,7 @@ init_db()
 
 def build_and_send_email(sender_email, sender_password, recipient_email, first_name, company_name):
     campaign_id = "summer_intern_2026"
-    subject = f"IIT Undergrad Interested in Interning at {company_name}"
+    subject = f"Requesting for Intership Opportunities at {company_name}"
     resume_link = "https://drive.google.com/file/d/1Y3UYalYI2f5bfryytbRIu8TwJQdbBcE-/view?usp=sharing"
 
     # Dynamic fallback check for company name presentation
@@ -124,7 +124,7 @@ if __name__ == "__main__":
     sent_count, failed_count = 0, 0
 
     try:
-        with open('mail_check.csv', 'r', newline='', encoding='utf-8-sig') as file:
+        with open('mail_check2.csv', 'r', newline='', encoding='utf-8-sig') as file:
             reader = csv.DictReader(file)
             for row in reader:
                 recipient = row['Email'].strip() if row.get('Email') else ''
@@ -139,10 +139,10 @@ if __name__ == "__main__":
                 
                 if success:
                     sent_count += 1
-                    time.sleep(10) # 10s Rate-limiting safety interval
+                    time.sleep(5) # 10s Rate-limiting safety interval
                 else:
                     failed_count += 1
-                    time.sleep(120) # Back-off protection on failures
+                    time.sleep(100) # Back-off protection on failures
     except FileNotFoundError:
         print("Error: 'mail_check2.csv' not found. Please place it in the workspace directory.")
 

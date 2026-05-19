@@ -28,28 +28,33 @@ STAGE_TEMPLATES = {
     }
 }
 
-def fetch_targets_for_stage(stage_number):
-    """Dynamically finds the correct parent message based on targeted stage."""
+def fetch_targets_for_stage(stage_number, delay_days=1):
+    """
+    Dynamically finds parent messages eligible for a follow-up stage.
+    Ensures that the parent email was sent at least `delay_days` ago.
+    """
     conn = sqlite3.connect(DB_NAME)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     
-    # If looking to send stage 1, look for successful 'initial' emails
-    # If looking to send stage 2, look for successful 'followup_1' emails
     parent_type = "initial" if stage_number == 1 else f"followup_{stage_number - 1}"
     current_type = f"followup_{stage_number}"
     
+    # SQLite logic: strftime('%s','now') gets current epoch time, 
+    # and we compare it against the parent's sent_time column.
+    # 86400 seconds = 1 day.
     query = f"""
         SELECT * FROM emails p
         WHERE p.status = 'SENT' 
           AND p.email_type = '{parent_type}'
+          AND ( (strftime('%s', 'now') - strftime('%s', p.sent_time)) >= (? * 86400) )
           AND NOT EXISTS (
               SELECT 1 FROM emails c 
               WHERE c.recipient_email = p.recipient_email 
                 AND c.email_type = '{current_type}'
           )
     """
-    cursor.execute(query)
+    cursor.execute(query, [delay_days])
     records = cursor.fetchall()
     conn.close()
     return records
@@ -137,15 +142,15 @@ def execute_followup_campaign(stage):
                 server.send_message(message)
             print(f"✅ Dispatched Stage {stage} Follow-up to: {recipient}")
             log_email_to_db(recipient, first_name, company, subject, body_html, new_msg_id, "SENT", email_type=f"followup_{stage}")
-            time.sleep(10)
+            time.sleep(5)
         except Exception as e:
             print(f"❌ Failed processing {recipient}: {e}")
             log_email_to_db(recipient, first_name, company, subject, body_html, None, "FAILED", error_msg=str(e), email_type=f"followup_{stage}")
-            time.sleep(120)
+            time.sleep(100)
 
 if __name__ == "__main__":
     # CHANGE THIS NUMBER DEPENDING ON WHICH STAGE YOU WANT TO EXECUTE
-    TARGET_STAGE = 1
+    TARGET_STAGE = 2
     
     print(f"--- Launching Follow-up Sequence Engine for Stage {TARGET_STAGE} ---")
     execute_followup_campaign(TARGET_STAGE)
