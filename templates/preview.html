@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<a href="/" style="text-decoration: none; color: #002b49; font-weight: bold;">&larr; Back to Dashboard</a>
+<div class="card">
+    <h2>Email Thread View (#{{ email.id }})</h2>
+    <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 20px;">
+    <p><span class="meta-label">Recipient:</span> {{ email.recipient_email }} ({% if email.first_name %}{{ email.first_name }}{% endif %})</p>
+    <p><span class="meta-label">Company:</span> {{ email.company_name }}</p>
+    <p><span class="meta-label">Subject:</span> {{ email.subject }}</p>
+    <p><span class="meta-label">Timestamp:</span> {{ email.sent_time }}</p>
+    <p><span class="meta-label">Current Step:</span> <span style="font-size: 11px; padding: 3px 8px; border-radius: 12px; background: #e2f0fe; color: #004085; font-weight: bold; text-transform: uppercase;">{{ email.email_type }}</span></p>
+    
+    {% if email.error_msg %}
+    <p style="color: red;"><span class="meta-label">Error Msg:</span> {{ email.error_msg }}</p>
+    {% endif %}
+
+    <div class="preview-box">
+        <h4 style="margin-top: 0; color: #6c757d; border-bottom: 1px dashed #ccc; padding-bottom: 10px;">Thread Conversation Stream:</h4>
+        
+        <div style="background: #ffffff; padding: 10px 0; margin-bottom: 20px;">
+            {{ email.body_html | safe }}
+        </div>
+        
+        {% for historical_mail in thread_history %}
+        <div style="border-left: 3px solid #0056b3; margin-top: 25px; padding-left: 20px; color: #222;">
+            <p style="color: #666; font-size: 13px; font-style: italic; margin-bottom: 15px;">
+                On {{ historical_mail.sent_time }} writing regarding campaign type ({{ historical_mail.email_type }}):
+            </p>
+            {{ historical_mail.body_html | safe }}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

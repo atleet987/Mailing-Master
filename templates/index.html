@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Mailing Campaign History Logs</h2>
+
+<div style="margin-bottom: 25px; border-bottom: 2px solid #dee2e6;">
+    <button onclick="switchMainTab('initial-tab', this)" style="background: #002b49; color: white; border: none; padding: 12px 24px; font-weight: bold; border-radius: 4px 4px 0 0; cursor: pointer; margin-right: 5px;" id="defaultOpen">Initial Outreach Logs</button>
+    <button onclick="switchMainTab('followup-tab', this)" style="background: #e9ecef; color: #333; border: none; padding: 12px 24px; font-weight: bold; border-radius: 4px 4px 0 0; cursor: pointer;">Follow-up Streams Logs</button>
+</div>
+
+<div id="initial-tab" class="main-tabcontent">
+    <h3>Initial Outreach History</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Recipient Email</th>
+                <th>Company</th>
+                <th>Subject</th>
+                <th>Status</th>
+                <th>Time Sent</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for email in emails %}
+                {% if email.email_type == 'initial' %}
+                <tr onclick="window.location='/email/{{ email.id }}'">
+                    <td>{{ email.id }}</td>
+                    <td><strong>{{ email.recipient_email }}</strong></td>
+                    <td>{{ email.company_name }}</td>
+                    <td>{{ email.subject }}</td>
+                    <td><span class="badge {% if email.status == 'SENT' %}badge-sent{% else %}badge-failed{% endif %}">{{ email.status }}</span></td>
+                    <td>{{ email.sent_time }}</td>
+                    <td><a class="view-btn" href="/email/{{ email.id }}">Open &rarr;</a></td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div id="followup-tab" class="main-tabcontent" style="display:none;">
+    
+    <div style="margin-bottom: 20px; background: #f1f3f5; padding: 8px; border-radius: 6px; display: inline-block;">
+        <button onclick="switchSubTab('stage1-sub', this)" style="background: #0056b3; color: white; border: none; padding: 8px 16px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-right: 5px;">Stage 1 Active</button>
+        <button onclick="switchSubTab('stage2-sub', this)" style="background: transparent; color: #495057; border: none; padding: 8px 16px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-right: 5px;">Stage 2 Active</button>
+        <button onclick="switchSubTab('stage3-sub', this)" style="background: transparent; color: #495057; border: none; padding: 8px 16px; font-weight: bold; border-radius: 4px; cursor: pointer;">Stage 3 Active</button>
+    </div>
+
+    <div id="stage1-sub" class="sub-tabcontent">
+        <h4 style="color: #6c757d; margin-top: 0;">Showing threads where Stage 1 Follow-up was the latest action:</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Recipient Email</th>
+                    <th>Company</th>
+                    <th>Subject</th>
+                    <th>Status</th>
+                    <th>Last Active Time</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for email in emails %}
+                    {% if email.email_type == 'followup_1' and email.latest_active_stage == 'followup_1' %}
+                    <tr onclick="window.location='/email/{{ email.id }}'">
+                        <td>{{ email.id }}</td>
+                        <td><strong>{{ email.recipient_email }}</strong></td>
+                        <td>{{ email.company_name }}</td>
+                        <td>{{ email.subject }}</td>
+                        <td><span class="badge {% if email.status == 'SENT' %}badge-sent{% else %}badge-failed{% endif %}">{{ email.status }}</span></td>
+                        <td>{{ email.sent_time }}</td>
+                        <td><a class="view-btn" href="/email/{{ email.id }}">Open &rarr;</a></td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="stage2-sub" class="sub-tabcontent" style="display:none;">
+        <h4 style="color: #6c757d; margin-top: 0;">Showing threads where Stage 2 Follow-up was the latest action:</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Recipient Email</th>
+                    <th>Company</th>
+                    <th>Subject</th>
+                    <th>Status</th>
+                    <th>Last Active Time</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for email in emails %}
+                    {% if email.email_type == 'followup_2' and email.latest_active_stage == 'followup_2' %}
+                    <tr onclick="window.location='/email/{{ email.id }}'">
+                        <td>{{ email.id }}</td>
+                        <td><strong>{{ email.recipient_email }}</strong></td>
+                        <td>{{ email.company_name }}</td>
+                        <td>{{ email.subject }}</td>
+                        <td><span class="badge {% if email.status == 'SENT' %}badge-sent{% else %}badge-failed{% endif %}">{{ email.status }}</span></td>
+                        <td>{{ email.sent_time }}</td>
+                        <td><a class="view-btn" href="/email/{{ email.id }}">Open &rarr;</a></td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="stage3-sub" class="sub-tabcontent" style="display:none;">
+        <h4 style="color: #6c757d; margin-top: 0;">Showing threads where Stage 3 Follow-up was the latest action:</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Recipient Email</th>
+                    <th>Company</th>
+                    <th>Subject</th>
+                    <th>Status</th>
+                    <th>Last Active Time</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for email in emails %}
+                    {% if email.email_type == 'followup_3' and email.latest_active_stage == 'followup_3' %}
+                    <tr onclick="window.location='/email/{{ email.id }}'">
+                        <td>{{ email.id }}</td>
+                        <td><strong>{{ email.recipient_email }}</strong></td>
+                        <td>{{ email.company_name }}</td>
+                        <td>{{ email.subject }}</td>
+                        <td><span class="badge {% if email.status == 'SENT' %}badge-sent{% else %}badge-failed{% endif %}">{{ email.status }}</span></td>
+                        <td>{{ email.sent_time }}</td>
+                        <td><a class="view-btn" href="/email/{{ email.id }}">Open &rarr;</a></td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+function switchMainTab(tabId, buttonElement) {
+    var i, maincontent, mainlinks;
+    maincontent = document.getElementsByClassName("main-tabcontent");
+    for (i = 0; i < maincontent.length; i++) {
+        maincontent[i].style.display = "none";
+    }
+    mainlinks = buttonElement.parentElement.children;
+    for (i = 0; i < mainlinks.length; i++) {
+        mainlinks[i].style.background = "#e9ecef";
+        mainlinks[i].style.color = "#333";
+    }
+    document.getElementById(tabId).style.display = "block";
+    buttonElement.style.background = "#002b49";
+    buttonElement.style.color = "white";
+}
+
+function switchSubTab(subTabId, buttonElement) {
+    var i, subcontent, sublinks;
+    subcontent = document.getElementsByClassName("sub-tabcontent");
+    for (i = 0; i < subcontent.length; i++) {
+        subcontent[i].style.display = "none";
+    }
+    sublinks = buttonElement.parentElement.children;
+    for (i = 0; i < sublinks.length; i++) {
+        sublinks[i].style.background = "transparent";
+        sublinks[i].style.color = "#495057";
+    }
+    document.getElementById(subTabId).style.display = "block";
+    buttonElement.style.background = "#0056b3";
+    buttonElement.style.color = "white";
+}
+</script>
+{% endblock %}
